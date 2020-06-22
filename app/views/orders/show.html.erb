@@ -1,0 +1,11 @@
+<p id="notice"><%= notice %></p>
+
+<p><%= @order.order_type %></p>
+<p><%= @order.recipient_name %></p>
+<p><%= @order.bouquet %></p>
+<p><%= @order.first_delivery_date %></p>
+<p><%= @order.shipping_option %></p>
+<p><%= @order.state %>
+
+<%= link_to 'Edit', edit_order_path(@order) %> |
+<%= link_to 'Back', orders_path %>
