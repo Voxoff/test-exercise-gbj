@@ -55,6 +55,7 @@ group :development do
 end
 
 group :test do
+  gem 'timecop'
   gem 'shoulda-matchers'
   gem 'capybara'
   gem 'database_cleaner'
