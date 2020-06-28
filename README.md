@@ -54,14 +54,23 @@ Once you've got this skeleton rails app up and running visit http://localhost:30
 
 How might you improve the architecture of the code? Specifically what might happen if the application were to die mid way through rake task and what will happen as complexity increases.
 
-After 1)
+### Clarification
+I would ask for clarification on the '3 month bundle' deliveries. The task says "3 month bundle" have 3 deliveries but that I should only create the delivery 'on that date', singular. So I've only created the first delivery.
 
-The AR query on orders ensures running the script twice will not result in duplicate deliveries. If the application were to die, there should be no problematic side effects. One potential problem would have occurred if the application died the moment after a delivery was created, but before the order was updated to 'completed'. The order would be incorrectly labelled. The transaction block - assuming correct DB configuration - mitigates this problem.
 
+### Decisions
+I have never implemented an API call that only needs to be called once every few years like the bank holidays endpoint. I opted for saving the json locally and raising an ArgumentError if the bank holidays are out of date. I considerd automating this process but, considering the very infrequent calls, it was better to leave this manual.
+
+The rake task is idempotent - even if the application were to die half way through. One potential problem would have occurred if the application died the moment after a delivery was created, but before the order was updated to 'completed'. The order would be incorrectly labelled. The transaction block - assuming correct DB configuration - mitigates this problem.
+
+
+### Increasing complexity
 As performance needs increases, it would be helpful to make the ActiveRecord queries more efficient: For example, condense all INSERT queries into one query.
 
 In the AR query in 'Order.create_deliveries_on', I currently check for orders that do not have deliveries: it may be necessary to change this to orders that do not have deliveries on the date supplied in the rake task parameter, which is slightly more accurate.
 
-The Selectable module seems unsatisfactory because A) The '#to_select_with_price' fires a deprecation warning about a 'Dangerous query method' and B) has methods which are not applicable to all the models it is included in.
+
+### Final Comments
+I didn't want to leverage the Selectable module because the '#to_select_with_price' fires a deprecation warning about a 'Dangerous query method'.
 
 

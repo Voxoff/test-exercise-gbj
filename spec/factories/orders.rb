@@ -1,11 +1,21 @@
 FactoryBot.define do
   factory :order do
     state { 'billed' }
+    recipient_name { "Guy" }
     first_delivery_date { Date.today }
     association :bouquet, :harper
-    association :shipping_option, :free
     association :order_type, :single_delivery
-    recipient_name { "Guy" }
+
+    free_shipping
+
+    trait :free_shipping do
+      association :shipping_option, :free
+    end
+
+    trait :premium_shipping do
+      association :shipping_option, :premium
+    end
+
 
     factory :order_with_delivery do
       after(:create) do |order, evaluator|

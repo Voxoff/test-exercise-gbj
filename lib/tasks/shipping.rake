@@ -8,7 +8,7 @@ task :shipping, [:date] do |t, args|
     next # Break out of rake task
   end
   date = Date.parse(args[:date])
-  Order.create_deliveries_on(date)
+  DeliveryHelper.new(date: date).create_deliveries
 
   puts "Orders created for #{args[:date]}!"
 end
