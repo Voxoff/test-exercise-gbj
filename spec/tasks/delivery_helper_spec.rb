@@ -124,6 +124,12 @@ RSpec.describe DeliveryHelper do
       end
     end
 
+    it 'ensures delivery is created only if order is also updated' do
+      order = create(:order)
+      allow(Delivery).to receive(:create).and_raise(StandardError)
+      expect(order.reload.state).to eq 'billed'
+    end
+
     it 'gets the orders in need of deliveries' do
       expect_any_instance_of(DeliveryHelper).to receive(:orders_to_deliver).and_call_original
       subject
