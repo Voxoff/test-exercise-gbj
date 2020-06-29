@@ -11,7 +11,7 @@ class DeliveryHelper
   end
 
   def create_deliveries
-    find_orders_to_deliver.each do |order|
+    orders_to_deliver.each do |order|
       order_hash = { order: order, delivery_date: delivery_date(order), bouquet: order.bouquet, recipient_name: order.recipient_name, shipping_option: order.shipping_option }
       Delivery.transaction do
         Delivery.create(order_hash)
@@ -21,14 +21,10 @@ class DeliveryHelper
   end
 
   def delivery_date(order)
-    if order.shipping_option.name == 'Free shipping'
-      first_available_free_date
-    else
-      date
-    end
+    order.shipping_option.name == 'Free shipping' ? first_available_free_date : date
   end
 
-  def find_orders_to_deliver
+  def orders_to_deliver
     # Get orders created on a certain day, with a billed state, which do not already have deliveries
     orders = Order.includes(:bouquet, :shipping_option, :order_type)
                   .where(first_delivery_date: date, state: 'billed')

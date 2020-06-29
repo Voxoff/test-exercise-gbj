@@ -2,8 +2,8 @@ require "rails_helper"
 require_relative "../../lib/tasks/delivery_helper"
 
 RSpec.describe DeliveryHelper do
-  describe '#find_orders_to_deliver' do
-    subject { DeliveryHelper.new(date: Date.today).find_orders_to_deliver }
+  describe '#orders_to_deliver' do
+    subject { DeliveryHelper.new(date: Date.today).orders_to_deliver }
 
     context 'when there are valid orders' do
       it 'should return the valid orders' do
@@ -27,9 +27,9 @@ RSpec.describe DeliveryHelper do
       end
     end
 
-    context 'when there are no orders on the required day' do
+    context 'when there are orders but none on the required day' do
       before do
-        Timecop.freeze(Date.today - 2.days) do
+        Timecop.freeze(Date.today - 1.days) do
           create(:order)
         end
       end
@@ -51,6 +51,7 @@ RSpec.describe DeliveryHelper do
   describe '#delivery_date' do
     let(:delivery_helper) { DeliveryHelper.new(date: Date.today) }
     subject { delivery_helper.delivery_date(order) }
+
     context 'free shipping' do
       let(:order) { create(:order) }
       it 'calls first_available_free_date' do
@@ -70,6 +71,7 @@ RSpec.describe DeliveryHelper do
 
   describe '#calculate_available_day' do
     subject { DeliveryHelper.new(date: date) }
+
     context 'not on a bank holiday' do
       let(:date) { Date.today }
       it 'should return the same day' do
@@ -122,6 +124,11 @@ RSpec.describe DeliveryHelper do
       end
     end
 
+    it 'gets the orders in need of deliveries' do
+      expect_any_instance_of(DeliveryHelper).to receive(:orders_to_deliver).and_call_original
+      subject
+    end
+
     it 'should create deliveries' do
       expect { subject }.to change { Delivery.count }.from(0).to(1)
     end
@@ -129,46 +136,6 @@ RSpec.describe DeliveryHelper do
     it 'should update the order' do
       expect_any_instance_of(Order).to receive(:update).with(state: 'complete')
       subject
-    end
-
-    context 'an order on a bank holiday with free shipping' do
-      before do
-        Timecop.travel(bank_holiday) do
-          create(:order)
-        end
-      end
-      let(:date) { bank_holiday }
-      it 'should create delivery on next available day' do
-        subject
-        expect(Delivery.last.delivery_date).to eq bank_holiday + 1.day
-      end
-    end
-
-    context 'an order on a non-bank holiday with free shipping' do
-      it 'should create delivery on next available day' do
-        subject
-        expect(Delivery.last.delivery_date).to eq date
-      end
-    end
-
-    context 'an order on a non-bank holiday with Premium shipping' do
-      it 'should create delivery on the day it was ordered' do
-        subject
-        expect(Delivery.last.delivery_date).to eq date
-      end
-    end
-
-    context 'an order on a bank holiday with Premium shipping' do
-      before do
-        Timecop.travel(bank_holiday) do
-          create(:order, :premium_shipping)
-        end
-      end
-      let(:date) { bank_holiday }
-      it 'should create delivery on the day it was ordered' do
-        subject
-        expect(Delivery.last.delivery_date).to eq bank_holiday
-      end
     end
   end
 end
