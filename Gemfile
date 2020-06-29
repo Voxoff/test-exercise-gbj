@@ -56,6 +56,7 @@ end
 
 group :test do
   gem 'timecop'
+  gem 'rails-controller-testing'
   gem 'shoulda-matchers'
   gem 'capybara'
   gem 'database_cleaner'

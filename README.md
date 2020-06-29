@@ -57,6 +57,7 @@ How might you improve the architecture of the code? Specifically what might happ
 ### Clarification
 I would ask for clarification on the '3 month bundle' deliveries. The task says "3 month bundle" have 3 deliveries but that I should only create the delivery 'on that date', singular. So I've only created the first delivery.
 
+Since I was only exposing delivery information, I only built out endpoints which read information.
 
 ### Decisions
 I have never implemented an API call that only needs to be called once every few years like the bank holidays endpoint. I opted for saving the json locally and raising an ArgumentError if the bank holidays are out of date. I considerd automating this process but, considering the very infrequent calls, it was better to leave this manual.

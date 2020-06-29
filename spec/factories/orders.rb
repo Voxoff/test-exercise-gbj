@@ -16,7 +16,6 @@ FactoryBot.define do
       association :shipping_option, :premium
     end
 
-
     factory :order_with_delivery do
       after(:create) do |order, evaluator|
         create_list(:delivery, 1, order: order)

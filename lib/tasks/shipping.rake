@@ -10,5 +10,5 @@ task :shipping, [:date] do |t, args|
   date = Date.parse(args[:date])
   DeliveryHelper.new(date: date).create_deliveries
 
-  puts "Orders created for #{args[:date]}!"
+  puts "Orders created for #{args[:date]}"
 end
